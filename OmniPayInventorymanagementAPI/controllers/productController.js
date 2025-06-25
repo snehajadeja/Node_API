@@ -37,5 +37,45 @@ const getProductByUPC = async (req, res) => {
   }
 };
 
+const getAllCategories = async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query('SELECT * FROM CategoryMaster');
+    res.status(200).json({ success: true, data: result.recordset });
+  } catch (err) {
+    console.error('❌ Error fetching categories:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
 
-module.exports = { getAllProducts, getProductByUPC };
+const getActiveSalesTax = async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query('SELECT * FROM SalesTax WHERE IsActive = 1');
+    res.status(200).json({ success: true, data: result.recordset });
+  } catch (err) {
+    console.error('❌ Error fetching SalesTax:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+const getCreditCardChargeConfig = async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input('configKey', sql.VarChar, 'CreditCardCharge')
+      .query('SELECT TOP 1 * FROM Config WHERE [Key] = @configKey');
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: 'Config not found' });
+    }
+
+    res.status(200).json({ success: true, data: result.recordset[0] });
+  } catch (err) {
+    console.error('❌ Error fetching Config:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+module.exports = { getAllProducts, getProductByUPC , getAllCategories, getActiveSalesTax, getCreditCardChargeConfig};

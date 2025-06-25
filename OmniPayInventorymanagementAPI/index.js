@@ -20,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api', authRoutes);
 app.use('/api', productRoutes);
 
+
 // ✅ Root route
 app.get('/', (req, res) => {
   res.send('Welcome to OmniPayInventorymanagementAPI!');
