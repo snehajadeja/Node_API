@@ -38,22 +38,43 @@
 
 // module.exports = { sql, poolPromise };
 
+// const sql = require('mssql');
+// require('dotenv').config();
+ 
+// const connectionString = process.env.AZURE_SQL_CONNECTION_STRING;
+ 
+// console.log('Attempting to connect with Azure SQL connection string');
+ 
+// const poolPromise = new sql.ConnectionPool(connectionString)
+//   .connect()
+//   .then(pool => {
+//     console.log('✅ Azure SQL Server Connected');
+//     return pool;
+//   })
+//   .catch(err => {
+//     console.error('❌ Database Connection Failed:', err);
+//     throw err;
+//   });
+ 
+// module.exports = { sql, poolPromise };
+
+
+
 const sql = require('mssql');
 require('dotenv').config();
- 
+
 const connectionString = process.env.AZURE_SQL_CONNECTION_STRING;
- 
+
 console.log('Attempting to connect with Azure SQL connection string');
- 
-const poolPromise = new sql.ConnectionPool(connectionString)
-  .connect()
+
+const poolPromise = sql.connect(connectionString)
   .then(pool => {
     console.log('✅ Azure SQL Server Connected');
     return pool;
   })
   .catch(err => {
     console.error('❌ Database Connection Failed:', err);
-    throw err;
+    process.exit(1); // Exit if connection fails
   });
- 
+
 module.exports = { sql, poolPromise };
