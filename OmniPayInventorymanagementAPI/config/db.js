@@ -63,18 +63,30 @@
 const sql = require('mssql');
 require('dotenv').config();
 
-const connectionString = process.env.AZURE_SQL_CONNECTION_STRING;
+console.log('Attempting to connect using environment variables...');
 
-console.log('Attempting to connect with Azure SQL connection string');
+const config = {
+  server: process.env.DB_SERVER, // e.g., 'omnipos-sql-server.database.windows.net'
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: parseInt(process.env.DB_PORT, 10),
+  options: {
+    encrypt: true, // For Azure
+    trustServerCertificate: false
+  }
+};
 
-const poolPromise = sql.connect(connectionString)
+const poolPromise = new sql.ConnectionPool(config)
+  .connect()
   .then(pool => {
     console.log('✅ Azure SQL Server Connected');
     return pool;
   })
   .catch(err => {
     console.error('❌ Database Connection Failed:', err);
-    process.exit(1); // Exit if connection fails
+    process.exit(1); // Force stop if DB fails
   });
 
 module.exports = { sql, poolPromise };
+
